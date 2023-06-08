@@ -43,7 +43,7 @@ public class NoticeListServlet extends HttpServlet {
 		try {
 			numPerpage = Integer.parseInt(request.getParameter("numPerpage"));
 		} catch (NumberFormatException e) {
-			numPerpage = 5;
+			numPerpage = 1;
 		}
 		String pageBar = "";
 		int totalData = new NoticeService().selectNoticeCount();
@@ -56,14 +56,14 @@ public class NoticeListServlet extends HttpServlet {
 			pageBar += "<span>[이전]<span>";
 		} else {
 			pageBar += "<a href='" + request.getRequestURI()
-				+ "?cPage=" + (pageNo-1) + "&numPerpage=" + numPerpage + ">[이전]</a>'";
+				+ "?cPage=" + (pageNo-1) + "&numPerpage=" + numPerpage + "'>[이전]</a>";
 		}
 		while(!(pageNo>pageEnd || pageNo>totalPage)) {
 			if(pageNo == cPage) {
 				pageBar += "<span>"+ pageNo +"</span>";
 			} else {
 				pageBar += "<a href='" + request.getRequestURI()
-				+ "?cPage=" + pageNo + "&numPerpage=" + numPerpage + ">" + pageNo + "</a>'";
+				+ "?cPage=" + pageNo + "&numPerpage=" + numPerpage + "'>" + pageNo + "</a>";
 			}
 			pageNo++;
 		}
@@ -71,7 +71,7 @@ public class NoticeListServlet extends HttpServlet {
 			pageBar += "<span>[다음]<span>";
 		} else {
 			pageBar += "<a href='" + request.getRequestURI()
-			+ "?cPage=" + pageNo + "&numPerpage=" + numPerpage + ">[다음]</a>'";
+			+ "?cPage=" + pageNo + "&numPerpage=" + numPerpage + "'>[다음]</a>";
 		}
 		request.setAttribute("pageBar", pageBar);
 		
