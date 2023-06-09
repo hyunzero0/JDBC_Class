@@ -57,7 +57,7 @@
 				</tr>
 				<tr>
 					<th>첨부파일</th>
-					<td></td>
+					<td><input type="file" name="upFile"></td>
 				</tr>
 				<tr>
 					<th>내용</th>

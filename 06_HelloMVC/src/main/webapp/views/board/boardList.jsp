@@ -35,7 +35,9 @@
 				<th>조회수</th>
 			</tr>
 			<%if(boards.isEmpty()){ %>
-			
+				<tr>
+					<td colspan="6">조회된 데이터가 없습니다.</td>
+				</tr>
 			<%}else{ 
 				for(Board b : boards){%>
 			<tr>

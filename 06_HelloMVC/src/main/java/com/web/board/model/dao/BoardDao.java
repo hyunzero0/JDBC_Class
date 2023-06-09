@@ -13,8 +13,7 @@ import java.util.List;
 import java.util.Properties;
 
 import com.web.board.model.vo.Board;
-
-import oracle.jdbc.proxy.annotation.Pre;
+import com.web.board.model.vo.BoardComment;
 
 public class BoardDao {
 	
@@ -22,6 +21,8 @@ public class BoardDao {
 	
 	public BoardDao() {
 		String path = BoardDao.class.getResource("/sql/board/boardsql.properties").getPath();
+		// 서블릿이 아닌 클래스이기 때문에 getContextPath 사용 불가
+		// common에 만들어서 가져다 써도 됨
 		try {
 			sql.load(new FileReader(path));
 		} catch(IOException e) {
@@ -92,4 +93,89 @@ public class BoardDao {
 			close(pstmt);
 		} return b;
 	}
+	
+	public int insertBoard(Connection conn, Board b) {
+		PreparedStatement pstmt = null;
+		int result = 0;
+		try {
+			pstmt = conn.prepareStatement(sql.getProperty("insertBoard"));
+			pstmt.setString(1, b.getBoardTitle());
+			pstmt.setString(2, b.getBoardWriter());
+			pstmt.setString(3, b.getBoardContent());
+			pstmt.setString(4, b.getBoardOriFilename());
+			pstmt.setString(5, b.getBoardRnFilename());
+			result = pstmt.executeUpdate();
+		} catch(SQLException e) {
+			e.printStackTrace();
+		} finally {
+			close(pstmt);
+		} return result;
+	}
+	
+	public int updateBoardReadCount(Connection conn, int no) {
+		PreparedStatement pstmt = null;
+		int result = 0;
+		try {
+			pstmt = conn.prepareStatement(sql.getProperty("updateBoardReadCount"));
+			pstmt.setInt(1, no);
+			result = pstmt.executeUpdate();
+		} catch(SQLException e) {
+			e.printStackTrace();
+		} finally {
+			close(pstmt);
+		} return result;
+	}
+	
+	public int insertBoardComment(Connection conn, BoardComment bc) {
+		PreparedStatement pstmt = null;
+		int result = 0;
+		try {
+			pstmt = conn.prepareStatement(sql.getProperty("insertBoardComment"));
+			pstmt.setInt(1, bc.getLevel());
+			pstmt.setString(2, bc.getBoardCommentWriter());
+			pstmt.setString(3, bc.getBoardCommentContent());
+			pstmt.setInt(4, bc.getBoardRef());
+			pstmt.setString(5, bc.getBoardCommentRef()==0?null:String.valueOf(bc.getBoardCommentRef()));
+			// int에 null 저장 안됨
+			// 형이 안맞는데? -> 오라클은 자동형변환을 잘해줌
+			result = pstmt.executeUpdate();
+		} catch(SQLException e) {
+			e.printStackTrace();
+		} finally {
+			close(pstmt);
+		} return result;
+	}
+	
+	public List<BoardComment> selectBoardComment(Connection conn, int no){
+		PreparedStatement pstmt = null;
+		ResultSet rs = null;
+		List<BoardComment> list = new ArrayList();
+		try {
+			pstmt = conn.prepareStatement(sql.getProperty("selectBoardComment"));
+			pstmt.setInt(1, no);
+			rs = pstmt.executeQuery();
+			while(rs.next()) list.add(getBoardComment(rs));
+		} catch(SQLException e) {
+			e.printStackTrace();
+		} finally {
+			close(rs);
+			close(pstmt);
+		} return list;
+	}
+	
+	private BoardComment getBoardComment(ResultSet rs) throws SQLException{
+		return BoardComment.builder()
+				.boardCommentNo(rs.getInt("board_comment_no"))
+				.level(rs.getInt("board_comment_level"))
+				.boardCommentWriter(rs.getString("board_comment_writer"))
+				.boardCommentContent(rs.getString("board_comment_content"))
+				.boardCommentDate(rs.getDate("board_comment_date"))
+				.boardCommentRef(rs.getInt("board_comment_ref"))
+				.boardRef(rs.getInt("board_ref"))
+				.build();
+	}
+	
+	
+	
+	
 }

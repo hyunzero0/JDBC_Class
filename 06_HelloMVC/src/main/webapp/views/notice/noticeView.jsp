@@ -20,7 +20,13 @@
             <th>첨부파일</th>
             <td>
            	<%if(n.getFilePath()!=null){ %>
-           		<img src="<%=request.getContextPath()%>/images/file.png" width="20">
+           		<div class="download-container" onclick="fileDownload('<%=n.getFilePath()%>');">
+           			<!-- 함수명('') -> 매개변수 : 문자열 / 함수명() -> 매개변수 : 변수명 -->
+           			<img src="<%=request.getContextPath()%>/images/file.png" width="20">
+           			<span><%=n.getFilePath() %></span>
+           		</div>
+           	<!-- FilePath에 renameFileName 저장되어 있음, 클라이언트 컴퓨터 이름 나오려면 -->
+           	<!-- originalFileName도 n에 저장해줘야함 -->
            	<%} %>
             </td>
         </tr>
@@ -47,6 +53,14 @@
     table#tbl-notice{width:500px; margin:0 auto; border:1px solid black; border-collapse:collapse; clear:both; }
     table#tbl-notice th {width: 125px; border:1px solid; padding: 5px 0; text-align:center;} 
     table#tbl-notice td {border:1px solid; padding: 5px 0 5px 10px; text-align:left;}
+    div.download-container{cursor:pointer;}
+    
     </style>
+    <script>
+    	const fileDownload=(filename)=>{
+    		/* 클릭했을 때 파일 이름을 알아야 함 -> 매개변수 or 불러오기(n.getFilename)*/
+    		location.assign("<%=request.getContextPath()%>/fileDownload.do?name="+ filename);
+    	}
+    </script>
 </section>
 <%@ include file="/views/common/footer.jsp"%>  

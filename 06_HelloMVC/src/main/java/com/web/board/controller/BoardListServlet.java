@@ -41,7 +41,7 @@ public class BoardListServlet extends HttpServlet {
 		try {
 			numPerpage = Integer.parseInt(request.getParameter("numPerpage"));
 		} catch (NumberFormatException e) {
-			numPerpage = 3;
+			numPerpage = 5;
 		}
 		String pageBar = "";
 		int totalData = new BoardService().selectBoardCount();
@@ -70,6 +70,7 @@ public class BoardListServlet extends HttpServlet {
 		} else {
 			pageBar += "<a href='" + request.getRequestURI()
 			+ "?cPage=" + pageNo + "&numPerpage=" + numPerpage + "'>[다음]</a>";
+			// numPerpage는 선택, 나중에 유동적으로 바뀔 수 있게하려면 보내는 게 좋음(로직에 맞춰서)
 		}
 		request.setAttribute("pageBar", pageBar);
 		
