@@ -121,7 +121,8 @@ table#tbl-board td {
 	</div>
 	<table id="tbl-comment">
 	<%if(comments!=null) {
-		for(BoardComment bc : comments){%>
+		for(BoardComment bc : comments){
+		if(bc.getLevel() == 1){%>
 		<tr class="level1">
 			<td>
 				<sub class="comment-writer"><%=bc.getBoardCommentWriter() %></sub>
@@ -130,17 +131,28 @@ table#tbl-board td {
 				<%=bc.getBoardCommentContent() %>
 			</td>
 			<td>
-				<button class="btn-reply">답글</button>
+				<button class="btn-reply" value="<%=bc.getBoardCommentNo()%>">답글</button>
 				
 				<!-- 작성자, 관리자만 가능 -->
 				<%if(loginMember!=null && (loginMember.getUserId().equals("admin")||loginMember.getUserId().equals(b.getBoardWriter()))){ %>
-					<button class="btn-reply">수정</button>
-					<button class="btn-reply">삭제</button>
+					<button class="btn-update">수정</button>
+					<button class="btn-delete">삭제</button>
 				<%} %>
 			</td>
 		</tr>
-			<%}
-		} %>
+			<%} else{ %>
+			<tr class="level2">
+				<td>
+					<sub class="comment-writer"><%=bc.getBoardCommentWriter() %></sub>
+					<sub class="comment-date"><%=bc.getBoardCommentDate() %></sub>
+					<br>
+					<%=bc.getBoardCommentContent() %>
+				</td>
+				<td></td>
+			</tr>
+		<% }
+		}
+		}%>
 	</table>
 </section>
 	<script>
@@ -155,6 +167,24 @@ table#tbl-board td {
 				$("#userId").focus();
 			}
 		})
-	
+		
+		$(".btn-reply").click(e=>{
+			const tr = $("<tr>");
+			const td = $("<td>").attr("colspan", "2");
+			const boardCommentRef = $(e.target).val();
+			const form = $(".comment-editor>form").clone(); // 댓글입력창 복사
+			form.find("textarea").attr("rows", "1"); // E + find -> 후손까지 찾음
+			form.find("input[name=level]").val("2"); // 답글 레벨로 변경
+			form.find("input[name=boardCommentRef]").val(boardCommentRef);
+			td.append(form);
+			tr.append(td);
+			td.css("display", "none");
+			tr.insertAfter($(e.target).parents("tr")).children("td").slideDown(1000);
+
+			// 답글 여러 번 눌러도 FORM 하나만 띄우기
+			$(e.target).off("click");
+			
+		});
+		
 	</script>
 <%@ include file="/views/common/footer.jsp"%>
