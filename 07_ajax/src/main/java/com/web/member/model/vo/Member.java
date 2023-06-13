@@ -32,6 +32,7 @@ public class Member {
 				+ "$" + new SimpleDateFormat("yyyy-MM-dd").format(enrollDate);
 	}
 	
+	
 }
 
 

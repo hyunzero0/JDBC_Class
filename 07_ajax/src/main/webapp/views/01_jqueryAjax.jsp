@@ -18,14 +18,15 @@
 
 	<h2>$.ajax() 함수 활용하기</h2>
 	<p>
-		매개변수로 요청에 대한 설정을 한 객체를 전달<br> 매개변수 객체의 key값은 $.ajax() 함수에서 정해놓음<br>
-		url : 요청주소 -> String<br> [type : 요청방식(get, post) -> String]
-		(default : get)<br> [data : 서버에 요청할 때 전송할 데이터 ->
-		Object({key:value, ...})]<br> [dataType : 응답데이터 타입설정 ->
-		String(json, html, text, ...)]<br> success : 응답이 완료되고 실행되는
-		callback함수 status 200일 때(성공) 실행하는 함수 -> (data)=>{}<br> [error :
-		응답이 완료되고 실행되는 callback함수 status 200이 아닐 때(실패) 실행하는 함수 -> (r, m,
-		e)=>{}]<br> [complete : 응답이 성공, 실패 되어도 무조건 실행되는 함수 -> ()=>{}]<br>
+		매개변수로 요청에 대한 설정을 한 객체를 전달<br>
+		매개변수 객체의 key값은 $.ajax() 함수에서 정해놓음<br>
+		url : 요청주소 -> String<br>
+		[type : 요청방식(get, post) -> String (default : get)<br>
+		[data : 서버에 요청할 때 전송할 데이터 -> Object({key:value, ...})]<br>
+		[dataType : 응답데이터 타입설정 -> String(json, html, text, ...)]<br>
+		success : 응답이 완료되고 실행되는 callback함수 status 200일 때(성공) 실행하는 함수 -> (data)=>{}<br>
+		[error : 응답이 완료되고 실행되는 callback함수 status 200이 아닐 때(실패) 실행하는 함수 -> (r, m, e)=>{}]<br>
+		[complete : 응답이 성공, 실패 되어도 무조건 실행되는 함수 -> ()=>{}]<br>
 		* url, success는 필수 매개변수
 	</p>
 
@@ -188,7 +189,120 @@
 	</script>
 
 
+	<h2>html페이지를 받아서 처리하기</h2>
+	<button id="btnhtml">html페이지 받아오기</button>
+	<div id="htmlcontainer"></div>
+	<script>
+		$("#btnhtml").click(function(e){
+			$.ajax({
+				url:"<%=request.getContextPath()%>/ajax/htmlTest.do",
+				dataType:"html",
+				success:function(data){
+					console.log(data);
+					$("#htmlcontainer").html(data);
+					// html페이지 받아서 처리하는 것보다 위처럼 직접 생성해서 하는게 더 좋은 코드
+				}
+			})
+		});
+	</script>
+	
+	
+	<h2>xml파일을 가져와 처리하기</h2>
+	<button id="xmlbtn">xml파일 가져오기</button>
+	<div id="xmlcontainer"></div>
+	<script>
+		$("#xmlbtn").click(e=>{
+			$.get("<%=request.getContextPath() %>/test/books.xml",
+					function(data){
+						/* console.log($(data)); */
+						const root = $(data).find(":root");
+						console.log(root);
+						const books = root.children();
+						console.log(books);
+						
+						const table = $("<table>");
+						const header = "<tr><th>구분</th><th>제목</th><th>작가</th></tr>";
+						table.html(header);
+						
+						books.each(function(i,e){
+							const tr = $("<tr>");
+							// let val = $(e).find("submit").text();
+							// text로 가지고있는 textnode 출력(value 가져올 수 있음)
+							const subject = $("<td>").text($(e).find("submit").text());
+							const title = $("<td>").text($(e).find("title").text());
+							const writer = $("<td>").text($(e).find("writer").text());
+							tr.append(subject).append(title).append(writer);
+							table.append(tr);
+						});
+						$("#xmlcontainer").html(table);
+						// .html은 덮어쓰기, .append는 추가
+						// -> .html은 그곳에 코드를 넣는거고, append는 자식에 추가하는 것
+					}
+			);		
+		});
+	</script>
 
+	
+	<h2>서버에서 보낸 데이터 활용하기</h2>
+	<input type="search" id="userId" list="data">
+	<button id="searchMember">아이디검색</button>
+	<datalist id="data"></datalist>
+	<div id="memberList"></div>
+	<script>
+		$("#userId").keyup(e=>{
+			$.get("<%=request.getContextPath()%>/searchId.do?id=" + $(e.target).val(),
+					function(data){
+					$("#data").html('');
+					// append 계속 추가되기 때문에 ''로 비워주기
+					const userIds = data.split(",");
+					console.log(userIds);
+					userIds.forEach(e=>{
+						const option = $("<option>").attr("value", e).text(e);
+						$("#data").append(option);
+						// append는 계속 추가됨 
+					})
+			})
+		});
+		
+		
+		$("#searchMember").click(e=>{
+			$.get("<%=request.getContextPath()%>/memberAll.do",
+					function(data){
+						// console.log(data);
+						// $("#memberList").html(data);
+						
+						// cvs 데이터 자체 가져오기
+						const table = $("<table>");
+						// const header = "<tr><th>아이디</th><th>이름</th><th>나이</th><th>성별</th><th>이메일</th>" +
+						//			"<th>전화번호</th><th>주소</th><th>취미</th><th>가입일</th><tr>";
+						const header = $("<tr>");
+						const headerdata = ["아이디", "이름", "나이", "성별", "이메일", "전화번호", "주소", "취미", "가입일"];
+						headerdata.forEach(e=>{
+							const th = $("<th>").text(e);
+							header.append(th);
+						});
+						table.append(header);
+						
+						const members = data.split("\n");
+						members.forEach(e=>{
+							const member = e.split("$");
+							const tr = $("<tr>");
+							member.forEach(m=>{
+								tr.append($("<td>").text(m));
+							});
+							table.append(tr);
+						})
+						$("#memberList").html(table);
+			});
+		})
+		
+		</script>
+	
 
 </body>
 </html>
+
+
+
+
+
