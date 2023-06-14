@@ -41,10 +41,28 @@
 		});
 	
 		$("#gsonBtn").click(e=>{
-			$.get("<%=request.getContextPath()%>/gsonTest.do",
+			<%-- $.get("<%=request.getContextPath()%>/gsonTest.do",
 					function(data){
 						console.log(data);
-			});
+						// get방식은 url주소에 넣을 순 없음
+			}); --%>
+			$.post("<%=request.getContextPath()%>/gsonTest.do",
+					{data:JSON.stringify({
+							// key값 파싱할 멤버변수명과 동일해야함
+							userId:"bsyoo",
+							password:"1234",
+							userName:"유병승",
+							gender:"M",
+							age:19,
+							email:"abc@abc.com",
+							phone:"01011111111",
+							address:"경기도시흥시",
+							enrollDate:'20230614'
+					})},
+					data=>{
+						
+						
+					});
 		});
 		
 	

@@ -1,8 +1,8 @@
 package com.web.member.model.vo;
 
-import java.sql.Date;
 import java.text.SimpleDateFormat;
 import java.util.Arrays;
+import java.util.Date;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
