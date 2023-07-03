@@ -156,11 +156,21 @@
 	<h4>**그 외 코어태그 활용하기**</h4>
 	<h4>c:import 태그</h4>
 	<p>다른 페이지를 불러와 내용을 변수에 저장하는 태그</p>
-	<c:import url="/views/common/header.jsp" var="header1"/>
+	<c:import url="/views/common/header.jsp" var="header1">
+		<c:param name="title" value="import"/>
+	</c:import>
 	<div>
 		${header1 }
 	</div>
 	
+	<h4>**c:catch태그**</h4>
+	<%
+		String name = null;
+	%>
+	<c:catch var="e">
+		<%= name.length() %>
+	</c:catch>
+	<c:out value="${e }"/>
 	
 </body>
 </html>
